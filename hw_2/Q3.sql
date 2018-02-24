@@ -142,3 +142,14 @@ as (select Author.id as id, Publication.pubid as pubid
 insert into Authored
 (select id, pubid from buf);
 
+
+
+
+alter table Authored add foreign key(id) references Author(id);
+alter table Authored add foreign key(pubid) references Publication(pubid);
+
+alter table Article add foreign key(pubid) references Publication(pubid);
+alter table Book add foreign key(pubid) references Publication(pubid);
+alter table Incollection add foreign key(pubid) references Publication(pubid);
+alter table Inproceedings add foreign key(pubid) references Publication(pubid);
+
