@@ -1,10 +1,10 @@
 with pods_pubs
 as (select pubid
-	from Publication natural join inproceedings
+	from Inproceedings
 	where booktitle='PODS')
 , sigmod_pubs
 as (select pubid
-	from Publication natural join inproceedings
+	from Inproceedings
 	where booktitle='SIGMOD Conference')
 , pods
 as (select id
