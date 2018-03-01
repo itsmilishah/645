@@ -49,6 +49,7 @@ set year=cast(Field.v as int)
 from Field
 where Field.p='year' and Field.k=pubkey;
 
+
 --Make Article
 delete from Article;
 
