@@ -3,26 +3,26 @@ delete from Author;
 drop sequence if exists seq;
 create sequence seq;
 
-with names
-as (select distinct v as name
-	from Field
-	where p='author')
-insert into Author(select nextval('seq') as id, name
-					from names);
-drop sequence seq;
-
-with names_ids
-as (select field.k as pubid, field.v as name
-	from field
-	where field.k like 'homepages%' and field .p='author')
+with 
+  names as (select distinct v as name from Field where p='author')
+, names_ids
+	as (select field.k as pubid, field.v as name
+		from field
+		where field.k like 'homepages%' and field.p='author')
 , author_homepages
-as (select name, field.v as homepage
-	from names_ids join field on pubid=field .k
-	where field.p='url')
-update Author
-set homepage=p.homepage
-from author_homepages as p
-where Author.name = p.name;
+	as (select name, max(field.v) as homepage
+		from names_ids join field on pubid=field.k
+		where field.p='url'
+		group by name)
+, joined
+	as (select names.name, homepage
+		from names left outer join 
+			author_homepages
+			on names.name=author_homepages.name)
+insert into Author(select nextval('seq') as id, name, homepage from joined)
+on conflict do nothing;
+
+drop sequence seq;
 
 
 --Make Publication
@@ -30,24 +30,22 @@ delete from Publication;
 drop sequence if exists seq;
 create sequence seq;
 
-with pubs
-as (select distinct Field.k as text
-	from Field join Pub on Field.k=Pub.k
-	where pub.p in ('book', 'article', 'inproceedings', 'incollection'))
+with f_title as (select k , v as title from Field where Field.p='title')
+, f_year as (select k , cast(v as int) as year from Field where Field.p='year')
+, pubs
+	as (select distinct Field.k as p_text
+		from Field join Pub on Field.k=Pub.k
+		where pub.p in ('book', 'article', 'inproceedings', 'incollection'))
+, joined
+	as (select distinct p_text, title, year
+		from pubs
+			left outer join f_title on p_text=f_title.k
+			left outer join f_year on p_text=f_year.k)
 insert into Publication
-(select nextval('seq') as pubid, text from pubs as pubkey);
+(select nextval('seq') as pubid, p_text as pubkey, title, year from joined)
+on conflict do nothing;
 
 drop sequence seq;
-
-update Publication
-set title=Field.v
-from Field
-where Field.p='title' and Field.k=pubkey;
-
-update Publication
-set year=cast(Field.v as int)
-from Field
-where Field.p='year' and Field.k=pubkey;
 
 
 --Make Article
