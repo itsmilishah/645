@@ -1,0 +1,53 @@
+Q1:
+------------------------------------------------
+1. 512*63 = 32256
+2. 512*63*16383*10*2 = 10569000960
+3. 4096/256 = 16
+4. 512*63*2*10/256 = 2520
+5.
+	256*1000000/512 = 500000
+	1000000/16 = 62500
+	1000000/2520 = 396.8 ~ 397
+6.
+	seek time: 9 msec + 396 msec = 0.405 sec
+		one initial random seek = 9 msec
+		track-to-track seek time = 1 msec * (397-1) = 396 msec
+	average rotational delay: 8.33/2 * 10^-3 = 4.165 * 10^-3 sec
+		revolution speed = 7200/60 = 120 rev/sec
+		1 revolution will cover 1 track
+		maximum time for the track to rotate = 1/120 = 8.33 msec
+	transfer time = (1000000*256)/7741440 = 33.0688 sec
+		capacity of 1 track = 32256
+		maximum time taken to read one track = 1/120 sec
+		average time taken to read one track = 1/240 sec
+		transfer rate = 32256/(1/240) = 7741440 bytes/sec
+	total time = 33.0688 + 0.405 + 0.004165 = 33.478 sec
+7.
+	cost per page: 9 + 4.165 + 0.529 = 13.694 msec
+		seek time : 9 msec
+		rotational delay : 4.165 msec
+		transfer time : 4096/7741440 = 0.000529
+			n_bytes = 4096 bytes
+			transfer rate = 7741440 bytes/sec
+	n_pages = 0.5 * (1000000*256)/4096 = 31250
+	total time = 13.694 * 10^-3 * 31250 ~ 427.9375 sec
+------------------------------------------------
+
+
+Q4
+------------------------------------------------
+Number of passes = 1 + ⎡log B-1 ⎡N/B⎤ ⎤ 
+Cost = 2N * (1 + ⎡log B-1 ⎡N/B⎤ ⎤ )
+n_runs = ⎡N/B⎤ /(B-1)^(n_pass-1)
+
+N = 1000000
+B = 21
+1. 47620
+2. 1 + ⎡log 20 ⎡1000000/21⎤ ⎤ = 4.59544416413 ~ 5
+3. 2 * 1000000 * (1 + ⎡log 21-1 ⎡1000000/21⎤ ⎤ ) = 10000000
+4.  2 = 1 + ⎡log B-1 ⎡N/B⎤ ⎤
+	1 = ⎡log B-1 ⎡N/B⎤ ⎤
+	B - 1 = N/B
+	B2 - B - 1000000 = 0
+	B = 1001
+------------------------------------------------
